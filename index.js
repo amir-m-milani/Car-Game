@@ -1,16 +1,17 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // main car
     const car = document.getElementById('car');
-    // const gameContainer = document.querySelector('.game-container');
+    // the road
     const road = document.querySelector(".road");
-
-    // let carPosition = 50; // Initial car position (percentage from the left)
-    // let speed = 2; // Adjust speed as needed
-    // let roadPosition = 0;
+    // list of random cars
+    let randomCars = [];
     const roadHeight = road.clientHeight;
     const roadWidth = road.clientWidth;
     let carPositionBottom = 10;
     let carPositionLeft = 10;
+    let randomCarPostionTop = -10;
     const carMovePosition = 10;
+    // moving the main car by keyboard
     document.addEventListener('keydown', function (event) {
         if (event.key === 'ArrowLeft' && carPositionLeft > 0) {
             carPositionLeft -= carMovePosition;
@@ -21,63 +22,47 @@ document.addEventListener('DOMContentLoaded', function () {
         } else if (event.key === 'ArrowDown' && carPositionBottom > 0) {
             carPositionBottom -= carMovePosition;
         }
-
-        updateCarPosition();
+        // update the position of the car
+        updateCarPosition(car);
     });
 
     // make random cars 
+    // every 4 second
     let makeRandomCarsContinuely = setInterval(() => {
+        //make random car
         let randomCar = makeRandomCars();
-        let topPosition = -10;
-        topPosition += 10;
-        randomCar.style.top = topPosition + '%';
+        // add to the list of random cars
+        randomCars.push(randomCar);
+        //move down
+    }, 4000);
+
+    // move random cars down
+    // every 1 second
+    let moveRandomCarsContinuely = setInterval(() => {
+        randomCars.forEach(function (element, index) {
+            let topPosition = (element.offsetTop / roadHeight) * 100;
+            if (topPosition > 110) {
+                element.remove();
+                randomCars.splice(index, 1);
+            }
+            else {
+                topPosition += 10;
+                element.style.top = topPosition + '%';
+            }
+        });
     }, 1000);
-
-
-    function updateCarPosition() {
-        car.style.left = carPositionLeft + '%';
-        car.style.bottom = carPositionBottom + '%';
-    }
 
     function makeRandomCars() {
         let randomCarPostion = [4, 24, 44, 64, 84];
         let randomCar = document.createElement('div');
         randomCar.classList.add('car', 'randomCar');
-        randomCar.style.left = randomCarPostion[Math.floor(Math.random() * randomCarPostion.length)]
-        randomCar.style.top = '-10%';
+        randomCar.style.left = randomCarPostion[Math.floor(Math.random() * randomCarPostion.length)] + '%';
         road.appendChild(randomCar);
         return randomCar;
     }
 
-    /*
-    function createRoad() {
-        const road1 = document.createElement('div');
-        road1.className = 'road';
-        gameContainer.appendChild(road1);
-
-        const road2 = document.createElement('div');
-        road2.className = 'road';
-        gameContainer.appendChild(road2);
-
-        return [road1, road2];
+    function updateCarPosition(element) {
+        element.style.left = carPositionLeft + '%';
+        element.style.bottom = carPositionBottom + '%';
     }
-
-    const roads = createRoad();
-    */
-    /*
-        function updateRoadPosition() {
-            roadPosition += speed;
-            roads.forEach(road => {
-                road.style.backgroundPositionY = roadPosition + 'px';
-            });
-    
-            if (roadPosition >= 100) {
-                roadPosition = 0;
-            }
-    
-            requestAnimationFrame(updateRoadPosition);
-        }
-    
-        updateRoadPosition();
-    */
 });
